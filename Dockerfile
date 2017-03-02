@@ -1,22 +1,16 @@
-FROM ubuntu:16.04
+FROM alpine:3.5
 
-ENV DEBIAN_FRONTEND=noninteractive
+RUN apk add --no-cache \
+		py2-pyldap \
+		python \
+		bash
 
-RUN apt-get update && \
-	apt-get install --no-install-recommends -y \
-	python \
-	python-ldap \
-	inetutils-ping && \
-	rm -rf /var/lib/apt/lists/*
-
-ENV VISUAL=vi LDAP_USER=nobody LDAP_PASSWORD=password LDAP_SERVER=not_set LDAP_BASE_DN=notset
 RUN mkdir /data && mkdir /app
 VOLUME ["/data"]
 
-COPY docker-entrypoint.sh /
+COPY ldapdump.py /app/
 WORKDIR /app
 
-COPY ldapdump.py /app/
-
+COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["dump"]
